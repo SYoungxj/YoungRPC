@@ -1,5 +1,4 @@
 #include "MprpcApplication.h"
-#include "MprpcConfig.h"
 #include <unistd.h>
 #include <iostream>
 #include <string>
@@ -13,7 +12,6 @@ void ShowArgsHelp()
 }
 
 MprpcApplication * MprpcApplication::pInstance_ = nullptr;
-MprpcConfig * MprpcApplication::pConfig_ = nullptr; 
 
 auto MprpcApplication::GetInstance() -> MprpcApplication *
 {
@@ -22,10 +20,6 @@ auto MprpcApplication::GetInstance() -> MprpcApplication *
         pInstance_ = new MprpcApplication();
     }
     return pInstance_;
-}
-MprpcConfig * MprpcApplication::GetConfig()
-{
-    return pConfig_;
 }
 
 void MprpcApplication::Init(int argc, char ** argv)
@@ -59,12 +53,5 @@ void MprpcApplication::Init(int argc, char ** argv)
     }
 
     // 初始化读配置文件类
-    pConfig_ = MprpcConfig::GetInstance();
-    // 开始加载配置文件了
-    pConfig_->LoadConfigFile(config_file);
-
-    cout << pConfig_->Load("RPCServerIP") << "\n";
-    cout << pConfig_->Load("RPCServerPORT") << "\n";
-    cout << pConfig_->Load("ZookeeperIP") << "\n";
-    cout << pConfig_->Load("ZookeeperPORT") << "\n";
+    MprpcConfig::GetInstance()->LoadConfigFile(config_file);
 }

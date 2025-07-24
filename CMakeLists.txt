@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(mpRPC)
+project(YoungRPC)
 
 # 生成 compile_commands.json 给 clangd 使用
 

@@ -15,7 +15,7 @@ public:
     {
         cout << "This is local service Login\n";
         cout << "name: " << name << " pwd: " << pwd << "\n";
-        return true;  // 添加了返回值
+        return 1;  // 添加了返回值
     }
 
     /*
@@ -34,19 +34,66 @@ public:
         string pwd = request->pwd();
 
         // 做本地业务
-        bool login_result = Login(name, pwd);
-
-        // 把响应写入
-        // 包括：错误码，错误信息，返回值
-        Young::ResultCode * errcode = response->mutable_result();
-        errcode->set_errcode(0);
-        errcode->set_errmsg("SUCCESS");
-        response->set_success(login_result);
-
+        if(Login(name, pwd))
+        {
+            // 把响应写入
+            // 包括：错误码，错误信息，返回值
+            Young::ResultCode * errcode = response->mutable_result();
+            errcode->set_errcode(0);
+            errcode->set_errmsg("Login Success");
+            response->set_success(1);
+        }
+        else
+        {
+            Young::ResultCode * errcode = response->mutable_result();
+            errcode->set_errcode(1);
+            errcode->set_errmsg("Login Failed");
+            response->set_success(0);
+        }
+        
         // 执行回调操作:
         // 执行响应对象数据的序列化和网络发送（都是由框架完成）
         done->Run();
     }
+
+    bool Register(uint32_t id, string name, string pwd)
+    {
+        cout << "This is local service Register\n";
+        cout << "id: " << id << " name: " << name << " pwd: " << pwd << "\n";
+        return true;  // 添加了返回值
+    }
+
+    void Register(::google::protobuf::RpcController* controller,
+                       const ::Young::RegisterRequest* request,
+                       ::Young::RegisterResponse* response,
+                       ::google::protobuf::Closure* done) override
+    {
+        // 获取参数
+        uint32_t id = request->id();
+        string name = request->name();
+        string pwd = request->pwd();
+        
+        // 做本地业务
+        // 并且填充响应的错误码信息
+        if(Register(id, name, pwd))
+        {
+            response->mutable_result()->set_errcode(0);
+            response->mutable_result()->set_errmsg("SUCCESS");
+            response->set_success(true);
+        }
+        else 
+        {
+            response->mutable_result()->set_errcode(1);
+            response->mutable_result()->set_errmsg("FAILED");
+            response->set_success(false);    
+        }
+
+        // 执行回调
+        // 自定义的 Closure * callback
+        // 主要负责：1. 序列化  2. 通过网络发送给 PRC 调用方 
+        done->Run();
+    }
+
 };
 
 int main(int argc, char ** argv)

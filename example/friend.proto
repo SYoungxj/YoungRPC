@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package Young;
+
+option cc_generic_services = true;
+
+message ResultCode
+{
+    uint32 errcode = 1;
+    bytes errmsg = 2;
+}
+
+message GetFriendListRequest
+{
+    uint32 userid = 1;
+}
+
+message User
+{
+    bytes name = 1;
+    uint32 age = 2;
+    enum Gender
+    {
+        MALE = 0;
+        FEMALE = 1;
+    }
+    Gender gender = 3;
+}
+
+message GetFriendListResponse
+{
+    ResultCode result = 1;
+    repeated User friend_list = 2; // 定义一个列表类型
+}
+
+service FriendServiceRPC
+{
+    rpc GetFriendList(GetFriendListRequest) returns(GetFriendListResponse);
+}
